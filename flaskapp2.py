@@ -116,36 +116,36 @@ def map():
 
             # Create a popup with available point cloud, DSM, and Ortho dates and dataIDs
             popup_content = f"""
-                <div style='font-family: Arial, sans-serif; width: 25vw; height: 40vh; overflow-y: scroll;'>
-                    <b>{site_name}</b><br><ul>
+                <div class='popup-content' style='font-family: Arial, sans-serif; font-size: 1.5vh; width: 15vw; height: 42vh; overflow-y: scroll; display: flex; align-items: center; justify-content: center; flex-direction: column;'>
+                    <b style='font-size: 2vh;'>{site_name}</b><br><ul>
                 """
             
-            # Point Clouds
-            popup_content += "<b>Point Clouds:</b><br><ul>"
-            for pointcloud in pointclouds:
-                if pointcloud[1] == site_id:  # Check if the siteID matches
-                    date = pointcloud[3]
-                    dataID = pointcloud[0]
-                    popup_content += f"<li><a href='/process_pointcloud/{dataID}'>{date}</a></li>"
-            popup_content += "</ul>"
-
-            # DSM
-            popup_content += "<b>DSM:</b><br><ul>"
-            for dsm in dsms:
-                if dsm[1] == site_id:  # Check if the siteID matches
-                    date = dsm[3]
-                    dsm_path = urllib.parse.quote(dsm[2])  # Encode the file path
-                    popup_content += f"<li><a href='/download_file/{dsm_path}'>{date}</a></li>"
-            popup_content += "</ul>"
-
             # Ortho
-            popup_content += "<b>Ortho:</b><br><ul>"
+            popup_content += "<div style='margin-top: 3vh; height: 9vh; width: 12vw; overflow-y: scroll;'><b>Ortho:</b><br><ul>"
             for ortho in orthos:
                 if ortho[1] == site_id:  # Check if the siteID matches
                     date = ortho[3]
                     ortho_path = urllib.parse.quote(ortho[2])  # Encode the file path
                     popup_content += f"<li><a href='/download_file/{ortho_path}'>{date}</a></li>"
-            popup_content += "</ul>"
+            popup_content += "</ul></div>"
+
+            # Point Clouds
+            popup_content += "<div style='margin-top: 3vh; height: 9vh; width: 12vw; overflow-y: scroll;'><b>Point Clouds:</b><br><ul>"
+            for pointcloud in pointclouds:
+                if pointcloud[1] == site_id:  # Check if the siteID matches
+                    date = pointcloud[3]
+                    dataID = pointcloud[0]
+                    popup_content += f"<li><a href='/process_pointcloud/{dataID}' onclick='showModal()'>{date}</a></li>"
+            popup_content += "</ul></div>"
+
+            # DSM
+            popup_content += "<div style='margin-top: 3vh; height: 9vh; width: 12vw; overflow-y: scroll;'><b>DSM:</b><br><ul>"
+            for dsm in dsms:
+                if dsm[1] == site_id:  # Check if the siteID matches
+                    date = dsm[3]
+                    dsm_path = urllib.parse.quote(dsm[2])  # Encode the file path
+                    popup_content += f"<li><a href='/download_file/{dsm_path}'>{date}</a></li>"
+            popup_content += "</ul></div>"
 
             # Add the popup to the marker
             marker.add_child(folium.Popup(popup_content))
@@ -156,7 +156,9 @@ def map():
         except ValueError as e:
             print(f"Error converting centroid coordinates for site {site_name}: {e}")
 
-    return my_map._repr_html_()
+    map_html = my_map._repr_html_()
+    return render_template('map.html', map_html=map_html)
+
 
 @app.route('/download_file/<path:file_path>')
 def download_file(file_path):
@@ -179,4 +181,4 @@ def download_file(file_path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5050, debug=True)
